@@ -472,6 +472,7 @@ function videoCardHTML(v, section) {
   </div>`;
 }
 
+
 // ============================================================
 // REPRODUCTOR — usa caché si está disponible
 // ============================================================
@@ -486,11 +487,14 @@ function playVideo(id) {
   let src;
   const cached = v.cacheStatus === 'cached' || v.cacheStatus === 'done';
 
+  // Lógica inteligente para la ruta del video
   if (cached) {
-    // Reproducir desde caché local — sin depender de internet
-    src = `http://localhost:3000/cache/${id}.mp4`;
+    // Si está en caché, usamos la API para obtener el video descargado
+    // Esto quita el '/api' de la URL base para apuntar a la ruta de archivos estáticos
+    const baseUrl = API.replace('/api', '');
+    src = `${baseUrl}/cache/${id}.mp4`;
   } else if (isYouTube(v.url)) {
-    // Sin caché: intentar embed (requiere internet)
+    // Si no hay caché y es YouTube, usamos el iframe (necesita internet)
     const ytId = getYTId(v.url);
     wrap.innerHTML = `<iframe
       src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0"
@@ -500,12 +504,14 @@ function playVideo(id) {
     openModal('playerModal');
     return;
   } else {
-    // Video local: servir a través del servidor para evitar restricciones
-    src = `http://localhost:3000/localfile?path=${encodeURIComponent(v.url)}`;
+    // Si es un archivo local de tu PC
+    src = `${API}/localfile?path=${encodeURIComponent(v.url)}`;
   }
 
+  // Insertamos el reproductor de video nativo
   wrap.innerHTML = `<video controls autoplay style="width:100%;height:100%;background:#000">
-    <source src="${src}">
+    <source src="${src}" type="video/mp4">
+    Tu navegador no soporta video.
   </video>`;
 
   showPlayerInfo(v, section, cached);
