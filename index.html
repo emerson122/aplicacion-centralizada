@@ -274,7 +274,10 @@
 </div>
 
 <script>
-const API = 'http://localhost:3000/api';
+// Detecta automáticamente si estás en tu PC o en Render
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000/api'  // URL para cuando trabajas en tu computadora
+    : '/api';                      // URL para cuando la página ya está subida a Render
 const COLORS = ['#c9a84c','#e74c3c','#3498db','#27ae60','#9b59b6','#e67e22','#1abc9c','#e91e8c','#607d8b','#ff5722'];
 
 let state = { sections: [], videos: [], activeSectionId: null, editingSectionId: null, editingVideoId: null };
